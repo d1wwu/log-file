@@ -23,5 +23,5 @@ public:
 	~CLogFile();
 	
 	void WriteFile(LPCTSTR pszFormat, ...);
-	void PrintError(PTCHAR pMsg);
+	void PrintError(TCHAR *pMsg);
 };

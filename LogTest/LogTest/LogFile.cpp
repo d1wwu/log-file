@@ -119,7 +119,7 @@ void CLogFile::WriteFile(LPCTSTR pszFormat, ...)
 			SYSTEMTIME	time;
 			::GetLocalTime(&time);
 
-			_ftprintf(m_pLogFile, _T("-----[START]: %04d/%02d/%02d %02d:%02d:%02d:%03d\n%s\n-----[END]\n\n"),
+			_ftprintf(m_pLogFile, _T("-----[START]: %04d/%02d/%02d %02d:%02d:%02d.%03d\n%s\n-----[END]\n\n"),
 				time.wYear, time.wMonth, time.wDay, time.wHour, time.wMinute, time.wSecond, time.wMilliseconds, szBuffer);
 
 			fflush(m_pLogFile);
@@ -127,7 +127,7 @@ void CLogFile::WriteFile(LPCTSTR pszFormat, ...)
 	}
 }
 
-void CLogFile::PrintError(PTCHAR pMsg)
+void CLogFile::PrintError(TCHAR *pMsg)
 {
 	LPTSTR pBuffer = nullptr;
 	DWORD dwErr = GetLastError();
