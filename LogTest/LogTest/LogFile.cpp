@@ -98,32 +98,27 @@ void CLogFile::CloseFile()
 
 void CLogFile::WriteFile(LPCTSTR pszFormat, ...)
 {
-	if (!m_pLogFile)
-		return;
-
 	TCHAR szBuffer[1024];
 	va_list args;
 	va_start(args, pszFormat);
 	_vsntprintf_s(szBuffer, _countof(szBuffer), _TRUNCATE, pszFormat, args);
 	va_end(args);
 
-	if (fseek(m_pLogFile, 0, SEEK_END) == 0) {
-		long lLength = ftell(m_pLogFile);
-
-		if (lLength >= m_lTruncate) {
-			CloseFile();
-			OpenFile(FormatName().c_str());
+	if (m_pLogFile) {
+		if (fseek(m_pLogFile, 0, SEEK_END) == 0) {
+			long lLength = ftell(m_pLogFile);
+			if (lLength >= m_lTruncate) {
+				CloseFile();
+				OpenFile(FormatName().c_str());
+			}
 		}
+		SYSTEMTIME	time;
+		::GetLocalTime(&time);
 
-		if (m_pLogFile) {
-			SYSTEMTIME	time;
-			::GetLocalTime(&time);
+		_ftprintf(m_pLogFile, _T("-----[START]: %04d/%02d/%02d %02d:%02d:%02d.%03d\n%s\n-----[END]\n\n"),
+			time.wYear, time.wMonth, time.wDay, time.wHour, time.wMinute, time.wSecond, time.wMilliseconds, szBuffer);
 
-			_ftprintf(m_pLogFile, _T("-----[START]: %04d/%02d/%02d %02d:%02d:%02d.%03d\n%s\n-----[END]\n\n"),
-				time.wYear, time.wMonth, time.wDay, time.wHour, time.wMinute, time.wSecond, time.wMilliseconds, szBuffer);
-
-			fflush(m_pLogFile);
-		}
+		fflush(m_pLogFile);
 	}
 }
 
@@ -139,7 +134,7 @@ void CLogFile::PrintError(TCHAR *pMsg)
 #ifdef _UNICODE
 		_setmode(_fileno(stdout), _O_U16TEXT);
 #endif
-		_tprintf(_T("%s failed with error 0x%X: %s"), pMsg, dwErr, pBuffer);
+		_tprintf(_T("%s failed with error 0x%lX: %s"), pMsg, dwErr, pBuffer);
 		LocalFree(pBuffer);
 		pBuffer = nullptr;
 	}
